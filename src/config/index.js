@@ -6,14 +6,14 @@ ipcMain.on('DISCORD_UPDATED_QUOTES', (e, c) => {
 
 let win;
 exports.open = () => {
-  if (win && !win.isDestroyed()) return win.show();
+  if (win) return win.show();
 
   win = require('../utils/win')({
     width: 500,
     height: 650
   }, 'config');
 
-  win.on('closed', () => {
+  win.on('close', () => {
     win = null;
   });
 
