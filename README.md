@@ -1,3 +1,5 @@
+# OpenAsar-legacy
+A modified version of OpenAsar for use with my [Discord-Legacy-Patcher](https://github.com/Jazzzny/Discord-Legacy-Patcher) project.
 # OpenAsar
 ![Nightly Status](https://github.com/GooseMod/OpenAsar/actions/workflows/nightly.yml/badge.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://choosealicense.com/licenses/mit/l) ![GitHub Sponsors](https://img.shields.io/github/sponsors/CanadaHonk?label=Sponsors&logo=github)
 
