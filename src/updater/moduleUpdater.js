@@ -47,7 +47,7 @@ const redirs = url => new Promise(res => get(url, r => { // Minimal wrapper arou
 }));
 
 exports.init = (endpoint, { releaseChannel, version }) => {
-  skipHost = settings.get('SKIP_HOST_UPDATE');
+  skipHost = true;
   skipModule = settings.get('SKIP_MODULE_UPDATE');
 
   basePath = join(paths.getUserDataVersioned(), 'modules');
