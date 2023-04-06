@@ -108,7 +108,7 @@ const startUpdate = () => {
 
     desktopCore.setMainWindowVisible(!startMin);
 
-    setTimeout(() => { // Try to update our asar
+    /*setTimeout(() => { // Try to update our asar
       const config = require('./config');
       if (oaConfig.setup !== true) config.open();
 
@@ -117,9 +117,9 @@ const startUpdate = () => {
           require('./asarUpdate')();
         } catch (e) {
           log('AsarUpdate', e);
-        }
+        } 
       }
-    }, 3000);
+    }, 3000);*/
   });
 
   splash.initSplash(startMin);
