@@ -36,15 +36,15 @@ const startCore = () => {
     bw.webContents.on('dom-ready', () => {
       if (!bw.resizable) return; // Main window only
       splash.pageReady(); // Override Core's pageReady with our own on dom-ready to show main window earlier
-
+    /*
       const [ channel = '', hash = '' ] = oaVersion.split('-'); // Split via -
-
+      
       bw.webContents.executeJavaScript(readFileSync(join(__dirname, 'mainWindow.js'), 'utf8')
         .replaceAll('<hash>', hash).replaceAll('<channel>', channel)
         .replaceAll('<notrack>', oaConfig.noTrack)
         .replace('<css>', (oaConfig.css ?? '').replaceAll('\\', '\\\\').replaceAll('`', '\\`')));
 
-      if (oaConfig.js) bw.webContents.executeJavaScript(oaConfig.js);
+      if (oaConfig.js) bw.webContents.executeJavaScript(oaConfig.js);*/
     });
   });
 
