@@ -2,6 +2,20 @@ const { app, session } = require('electron');
 const { readFileSync } = require('fs');
 const { join } = require('path');
 
+if (!readFileSync.readFileAsync.replaceAll) {
+	readFileSync.readFileAsync.replaceAll = function(str, newStr){
+
+		// If a regex pattern
+		if (Object.prototype.toString.call(str).toLowerCase() === '[object regexp]') {
+			return this.replace(str, newStr);
+		}
+
+		// If a string
+		return this.replace(new RegExp(str, 'g'), newStr);
+
+	};
+}
+
 if (!settings.get('enableHardwareAcceleration', true)) app.disableHardwareAcceleration();
 process.env.PULSE_LATENCY_MSEC = process.env.PULSE_LATENCY_MSEC ?? 30;
 
@@ -32,7 +46,7 @@ const startCore = () => {
     cb(d);
   });
 
-  /*app.on('browser-window-created', (e, bw) => { // Main window injection
+  app.on('browser-window-created', (e, bw) => { // Main window injection
     bw.webContents.on('dom-ready', () => {
       if (!bw.resizable) return; // Main window only
       splash.pageReady(); // Override Core's pageReady with our own on dom-ready to show main window earlier
@@ -57,42 +71,11 @@ const startCore = () => {
     if (oaConfig.js) {
       bw.webContents.executeJavaScript(oaConfig.js);
     }
-  })*/
-
-
-  
-  app.on('browser-window-created', (e, bw) => {
-    bw.webContents.on('dom-ready', () => {
-      if (!bw.resizable) return;
-      splash.pageReady();
-  
-      const [channel = '', hash = ''] = oaVersion.split('-');
-      const mainWindowPath = path.join(__dirname, 'mainWindow.js');
-  
-      fs.readFile(mainWindowPath, 'utf8', (err, mainWindowData) => {
-        if (err) {
-          console.error(err);
-          return;
-        }
-  
-        const mainWindowCode = mainWindowData
-          .replace(/<hash>/g, hash)
-          .replace(/<channel>/g, channel)
-          .replace(/<notrack>/g, oaConfig.noTrack)
-          .replace('<css>', (oaConfig.css ?? '').replace(/\\/g, '\\\\').replace(/`/g, '\\`'));
-  
-        bw.webContents.executeJavaScript(mainWindowCode);
-  
-        if (oaConfig.js) {
-          bw.webContents.executeJavaScript(oaConfig.js);
-        }
-      });
-
-  
-/*  .catch((err) => {
+  })
+  .catch((err) => {
     console.error(`Error reading file "${mainWindowPath}":`, err);
   });
-*/
+
     });
   });
 
