@@ -2,6 +2,15 @@ const { app, session } = require('electron');
 const { readFileSync } = require('fs');
 const { join } = require('path');
 
+
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+function replaceAll(str, match, replacement){
+   return str.replace(new RegExp(escapeRegExp(match), 'g'), ()=>replacement);
+}
+
+
 if (!settings.get('enableHardwareAcceleration', true)) app.disableHardwareAcceleration();
 process.env.PULSE_LATENCY_MSEC = process.env.PULSE_LATENCY_MSEC ?? 30;
 
@@ -36,15 +45,32 @@ const startCore = () => {
     bw.webContents.on('dom-ready', () => {
       if (!bw.resizable) return; // Main window only
       splash.pageReady(); // Override Core's pageReady with our own on dom-ready to show main window earlier
+    
+      const path = require('path');
+      const { promisify } = require('util');
+      const readFileAsync = promisify(require('fs').readFile);
 
-      const [ channel = '', hash = '' ] = oaVersion.split('-'); // Split via -
+      const [channel = '', hash = ''] = oaVersion.split('-');
+      const mainWindowPath = path.join(__dirname, 'mainWindow.js');
 
-      bw.webContents.executeJavaScript(readFileSync(join(__dirname, 'mainWindow.js'), 'utf8')
-        .replaceAll('<hash>', hash).replaceAll('<channel>', channel)
-        .replaceAll('<notrack>', oaConfig.noTrack)
-        .replace('<css>', (oaConfig.css ?? '').replaceAll('\\', '\\\\').replaceAll('`', '\\`')));
+      readFileAsync(mainWindowPath, 'utf8')
+        .then((mainWindowData) => {
+        const mainWindowCode = mainWindowData
+        replaceAll('<hash>', hash)
+        replaceAll('<channel>', channel)
+        replaceAll('<notrack>', oaConfig.noTrack)
+        .replace('<css>', (oaConfig.css ?? '').replaceAll('\\', '\\\\').replaceAll('`', '\\`'));
+    
+    bw.webContents.executeJavaScript(mainWindowCode);
 
-      if (oaConfig.js) bw.webContents.executeJavaScript(oaConfig.js);
+    if (oaConfig.js) {
+      bw.webContents.executeJavaScript(oaConfig.js);
+    }
+  })
+  .catch((err) => {
+    console.error(`Error reading file "${mainWindowPath}":`, err);
+  });
+
     });
   });
 
