@@ -32,7 +32,7 @@ setInterval(() => {
 
   const oaVersion = host.cloneNode(true);
   oaVersion.id = 'openasar-ver';
-  oaVersion.textContent = 'OpenAsar <channel> ';
+  oaVersion.textContent = 'OpenAsar-Legacy ';
   oaVersion.onclick = () => DiscordNative.ipc.send('DISCORD_UPDATED_QUOTES', 'o');
 
   const oaHash = document.querySelector('[class*="versionHash-"]').cloneNode(true);
