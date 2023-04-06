@@ -1,17 +1,19 @@
 const { app, session } = require('electron');
 const { readFileSync } = require('fs');
 const { join } = require('path');
-
-function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-}
-
-
+// Polyfill replaceall
 if (!String.prototype.replaceAll) {
-  
-  String.prototype.replaceAll = function (str, match, replacement){
-    return str.replace(new RegExp(escapeRegExp(match), 'g'), ()=>replacement);
- };
+	String.prototype.replaceAll = function(str, newStr){
+
+		// If a regex pattern
+		if (Object.prototype.toString.call(str).toLowerCase() === '[object regexp]') {
+			return this.replace(str, newStr);
+		}
+
+		// If a string
+		return this.replace(new RegExp(str, 'g'), newStr);
+
+	};
 }
 
 if (!settings.get('enableHardwareAcceleration', true)) app.disableHardwareAcceleration();
@@ -62,7 +64,7 @@ const startCore = () => {
         .replaceAll('<hash>', hash)
         .replaceAll('<channel>', channel)
         .replaceAll('<notrack>', oaConfig.noTrack)
-        .replace('<css>', (oaConfig.css ?? '').replaceAll('\\', '\\\\').replaceAll('`', '\\`'));
+        .replace('<css>', (oaConfig.css ?? ''));//.replaceAll('\\', '\\\\').replaceAll('`', '\\`')); -- This breaks Electron, does not seem to be needed on macOS so commented out
     
     bw.webContents.executeJavaScript(mainWindowCode);
 
