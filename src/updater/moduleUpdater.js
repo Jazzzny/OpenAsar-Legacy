@@ -59,7 +59,7 @@ exports.init = (endpoint, { releaseChannel, version }) => {
   Module.globalPaths.push(basePath);
 
   // Purge pending
-  fs.rmSync(downloadPath, { recursive: true, force: true });
+  //fs.rmSync(downloadPath, { recursive: true, force: true });
   mkdir(downloadPath);
 
   try {
