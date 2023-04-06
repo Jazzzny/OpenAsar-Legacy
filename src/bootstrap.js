@@ -2,8 +2,8 @@ const { app, session } = require('electron');
 const { readFileSync } = require('fs');
 const { join } = require('path');
 
-if (!readFileSync.readFileAsync.replaceAll) {
-	readFileSync.readFileAsync.replaceAll = function(str, newStr){
+if (!String.prototype.replaceAll) {
+	String.prototype.replaceAll = function(str, newStr){
 
 		// If a regex pattern
 		if (Object.prototype.toString.call(str).toLowerCase() === '[object regexp]') {
