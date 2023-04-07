@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -20,9 +20,8 @@ jobs:
 
     - name: Pack base asar
       run: |
-        npm i -g asar
+        npm i -g @electron/asar
         sed -i -e "s/nightly/nightly-$(git rev-parse HEAD | cut -c 1-7)/" src/index.js
-        node scripts/strip.js
         npx asar pack src app.asar
 
     - name: Upload artifact
