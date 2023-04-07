@@ -30,3 +30,9 @@ jobs:
       with:
         name: built-asar
         path: app.asar
+    - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          name: 0.0.263-${{ github.workspace }}
+          files: app.asar
