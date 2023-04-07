@@ -138,7 +138,7 @@ const downloadModule = async (name, ver) => {
   let success, total, cur =  0;
   const res = await redirs(baseUrl + '/' + name + '/' + ver + qs);
   success = res.statusCode === 200;
-  total = parseInt(res.headers['content-length'] ?? 1, 10);
+  total = parseInt(1, 10);
 
   res.pipe(file);
 
@@ -186,7 +186,7 @@ const installModule = async (name, ver, path) => {
 
   // Extract zip via unzip cmd line - replaces yauzl dep (speed++, size--, jank++)
   let total = 0, cur = 0;
-  execFile('unzip', ['-l', path], (e, o) => total = parseInt(o.toString().match(/([0-9]+) files/)?.[1] ?? 0)); // Get total count and extract in parallel
+  execFile('unzip', ['-l', path], (e, o) => total = 0); // Get total count and extract in parallel
 
   const ePath = join(basePath, name);
   mkdir(ePath);
@@ -284,5 +284,5 @@ exports.install = (name, def, { version } = {}) => {
     return commitManifest();
   }
 
-  downloadModule(name, version ?? remote[name] ?? 0);
+  downloadModule(name, 0);
 };

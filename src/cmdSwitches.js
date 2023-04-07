@@ -9,11 +9,27 @@ const presets = {
 
 module.exports = () => {
   let c = {};
-  for (const x of ('base,' + (oaConfig.cmdPreset || 'perf')).split(',').reduce((a, x) => a.concat(presets[x]?.split(' ')), [])) {
+  let presetValues = presets.base.split(' ');
+
+  if (oaConfig.cmdPreset) {
+    const presetKeys = ('base,' + oaConfig.cmdPreset).split(',');
+    for (const key of presetKeys) {
+      const value = presets[key];
+      if (value) {
+        presetValues = presetValues.concat(value.split(' '));
+      }
+    }
+  }
+
+  for (const x of presetValues) {
     if (!x) continue;
     const [ k, v ] = x.split('=');
 
-    (c[k] = c[k] || []).push(v);
+    if (!c[k]) {
+      c[k] = [];
+    }
+
+    c[k].push(v);
   }
 
   for (const k in c) {

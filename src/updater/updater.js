@@ -19,7 +19,7 @@ class Updater extends require('events').EventEmitter {
 
     let Native;
     try {
-      Native = options.nativeUpdaterModule ?? require(paths.getExeDir() + '/updater');
+      Native = (options.nativeUpdaterModule !== null && options.nativeUpdaterModule !== undefined) ? options.nativeUpdaterModule : require(paths.getExeDir() + '/updater');
     } catch (e) {
       log('Updater', e); // Error when requiring
 
@@ -109,7 +109,10 @@ class Updater extends require('events').EventEmitter {
 
         this._recordTaskProgress(progress);
 
-        request.progressCallback?.(progress);
+        if (request.progressCallback && typeof request.progressCallback === 'function') {
+          request.progressCallback(progress);
+        }
+        
 
         if (progress.task['HostInstall'] != null && progress.state === TASK_STATE_COMPLETE) this.emit('host-updated');
       } else log('Updater', id, detail); // Unknown response
@@ -143,7 +146,8 @@ class Updater extends require('events').EventEmitter {
     const cur = resolve(process.execPath);
     const next = resolve(join(this._getHostPath(), basename(process.execPath)));
 
-    if (next != cur && !options?.allowObsoleteHost) {
+    if (next != cur && !(options && options.allowObsoleteHost)) {
+
       // Retain OpenAsar
       const fs = require('original-fs');
 
@@ -304,7 +308,7 @@ class Updater extends require('events').EventEmitter {
   async commitModules(versions) {
     if (this.committedHostVersion == null) throw 'No host';
 
-    this._commitModulesInner(versions ?? await this.queryCurrentVersions());
+    this._commitModulesInner((versions !== null && versions !== undefined) ? versions : await this.queryCurrentVersions());
   }
 
   queryAndTruncateHistory() {

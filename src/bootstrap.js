@@ -17,7 +17,7 @@ if (!String.prototype.replaceAll) {
 }
 
 if (!settings.get('enableHardwareAcceleration', true)) app.disableHardwareAcceleration();
-process.env.PULSE_LATENCY_MSEC = process.env.PULSE_LATENCY_MSEC ?? 30;
+process.env.PULSE_LATENCY_MSEC = 30;
 
 const buildInfo = require('./utils/buildInfo');
 app.setVersion(buildInfo.version); // More global because discord / electron
@@ -64,7 +64,7 @@ const startCore = () => {
         .replaceAll('<hash>', hash)
         .replaceAll('<channel>', channel)
         .replaceAll('<notrack>', oaConfig.noTrack)
-        .replace('<css>', (oaConfig.css ?? ''));//.replaceAll('\\', '\\\\').replaceAll('`', '\\`')); -- This breaks Electron, does not seem to be needed on macOS so commented out
+        .replace('<css>', ((oaConfig.css !== null && oaConfig.css !== undefined) ? oaConfig.css : ""));//.replaceAll('\\', '\\\\').replaceAll('`', '\\`')); -- This breaks Electron, does not seem to be needed on macOS so commented out
     
     bw.webContents.executeJavaScript(mainWindowCode);
 
@@ -113,7 +113,11 @@ const startUpdate = () => {
 
   if (urls.length > 0) session.defaultSession.webRequest.onBeforeRequest({ urls }, (e, cb) => cb({ cancel: true }));
 
-  const startMin = process.argv?.includes?.('--start-minimized');
+  let startMin = false;
+  if (process.argv && process.argv.includes && typeof process.argv.includes === 'function') {
+    startMin = process.argv.includes('--start-minimized');
+  }
+
 
   if (updater.tryInitUpdater(buildInfo, Constants.NEW_UPDATE_ENDPOINT)) {
     const inst = updater.getUpdater();
@@ -159,10 +163,15 @@ const startUpdate = () => {
 
 module.exports = () => {
   app.on('second-instance', (e, a) => {
-    desktopCore?.handleOpenUrl?.(a.includes('--url') && a[a.indexOf('--') + 1]); // Change url of main window if protocol is used (uses like "discord --url -- discord://example")
+    if (desktopCore && desktopCore.handleOpenUrl) {
+      const urlIndex = a.indexOf('--') + 1;
+      desktopCore.handleOpenUrl(a.includes('--url') && a[urlIndex]);
+    }
   });
 
-  if (!app.requestSingleInstanceLock() && !(process.argv?.includes?.('--multi-instance') || oaConfig.multiInstance === true)) return app.quit();
+  if (!app.requestSingleInstanceLock() && (!process.argv || !process.argv.includes || !process.argv.includes('--multi-instance') && oaConfig.multiInstance !== true)) {
+    return app.quit();
+  }
 
   app.whenReady().then(startUpdate);
 };

@@ -21,7 +21,7 @@ class Settings { // Heavily based on original for compat, but simplified and twe
   }
 
   get(k, d) {
-    return this.store[k] ?? d;
+    return (this.store[k] !== null && this.store[k] !== undefined) ? this.store[k] : d;
   }
 
   set(k, v) {
@@ -43,4 +43,4 @@ class Settings { // Heavily based on original for compat, but simplified and twe
 }
 
 let inst; // Instance of class
-exports.getSettings = () => inst = inst ?? new Settings(require('path').join(require('./paths').getUserData(), 'settings.json'));
+exports.getSettings = () => inst = (inst !== null && inst !== undefined) ? inst : new Settings(require('path').join(require('./paths').getUserData(), 'settings.json'));

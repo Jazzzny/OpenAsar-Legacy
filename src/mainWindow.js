@@ -2,14 +2,25 @@ if ('<notrack>' === 'true') { // Disable sentry
   try {
     window.__SENTRY__.hub.getClient().getOptions().enabled = false;
 
-    Object.keys(console).forEach(x => console[x] = console[x].__sentry_original__ ?? console[x]);
+    Object.keys(console).forEach(x => console[x] = (console[x].__sentry_original__ !== null && console[x].__sentry_original__ !== undefined) ? console[x].__sentry_original__ : console[x]);
   } catch { }
 }
 
 let lastBgPrimary = '';
 const themesync = async () => {
-  const getVar = (name, el = document.body) => el && (getComputedStyle(el).getPropertyValue(name) || getVar(name, el.parentElement))?.trim();
-
+  const getVar = (name, el) => {
+    el = el || document.body;
+    const style = getComputedStyle(el);
+    const value = style.getPropertyValue(name);
+    if (value) {
+      return value.trim();
+    } else if (el.parentElement) {
+      return getVar(name, el.parentElement);
+    } else {
+      return undefined;
+    }
+  };
+  
   const bgPrimary = getVar('--background-primary');
   if (!bgPrimary || bgPrimary === '#36393f' || bgPrimary === '#fff' || bgPrimary === lastBgPrimary) return; // Default primary bg or same as last
   lastBgPrimary = bgPrimary;

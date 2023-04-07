@@ -25,11 +25,19 @@ exports.initSplash = (startMin) => {
   }, 300);
 };
 
-exports.focusWindow = () => win?.focus?.();
+exports.focusWindow = () => {
+  if (win && win.focus && typeof win.focus === 'function') {
+    win.focus();
+  }
+};
+
 exports.pageReady = () => destroySplash() || process.nextTick(() => events.emit('APP_SHOULD_SHOW'));
 
 const destroySplash = () => {
-  win?.setSkipTaskbar?.(true);
+  if (win && win.setSkipTaskbar && typeof win.setSkipTaskbar === 'function') {
+    win.setSkipTaskbar(true);
+  }
+  
 
   setTimeout(() => {
     if (!win) return;
@@ -94,7 +102,7 @@ class UIProgress { // Generic class to track updating and sent states to splash
   record(id, state, current, outOf) {
     this.total.add(id);
 
-    if (current) this.progress.set(id, [ current, outOf ?? 100 ]);
+    if (current) this.progress.set(id, [ current, 100 ]);
     if (state === 'Complete') this.done.add(id);
 
     this.send();
