@@ -29,3 +29,11 @@ jobs:
       with:
         name: built-asar
         path: app.asar
+
+    - name: Upload release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: 0.0.262
+        files: app.asar
