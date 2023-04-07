@@ -33,5 +33,6 @@ jobs:
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        name: 0.0.263-${{ github.workspace }}
+        tag_name: ${{ env.version }}
+        name: 0.0.263
         files: app.asar
