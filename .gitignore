@@ -5,3 +5,4 @@ _*
 miniSrc/
 
 *.crswap # crostini tmp files
+.DS_Store
