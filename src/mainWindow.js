@@ -27,25 +27,27 @@ const themesync = async () => {
 
 // Settings injection
 setInterval(() => {
-  const host = [...document.querySelectorAll('[class*="info-"] [class*="line-"]')].find(x => x.textContent.startsWith('Host '));
-  if (!host || document.querySelector('#openasar-ver')) return;
+  const host = [...document.querySelectorAll('[class*="sidebar"] [class*="info"] [class*="line"]')].find(x => x.textContent.startsWith('Host '));
+  if (!host || document.getElementById('openasar-ver')) return;
 
   const oaVersion = host.cloneNode(true);
   oaVersion.id = 'openasar-ver';
-  oaVersion.textContent = 'OpenAsar-Legacy ';
+  oaVersion.textContent = 'OpenAsar <channel> ';
   oaVersion.onclick = () => DiscordNative.ipc.send('DISCORD_UPDATED_QUOTES', 'o');
 
-  const oaHash = document.querySelector('[class*="versionHash-"]').cloneNode(true);
+  const oaHash = document.querySelector('[class*="versionHash"]').cloneNode(true);
   oaHash.textContent = '(<hash>)';
   oaVersion.appendChild(oaHash);
 
   host.insertAdjacentElement('afterend', oaVersion);
 
-  const advanced = document.querySelector('[class*="socialLinks-"]').parentElement.querySelectorAll('[class*="separator-')[2].previousElementSibling;
-  if (!advanced) return;
+  let advanced = document.querySelector('[class*="socialLinks"]').parentElement.querySelector('[class*="header"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"]');
+  if (!advanced || document.getElementById('openasar-item')) return;
+  if (advanced.nextSibling.className.includes('item')) advanced = advanced.nextSibling;
 
   const oaSetting = advanced.cloneNode(true);
   oaSetting.textContent = 'OpenAsar';
+  oaSetting.id = 'openasar-item';
   oaSetting.onclick = oaVersion.onclick;
 
   advanced.insertAdjacentElement('afterend', oaSetting);
@@ -78,5 +80,7 @@ const optimize = orig => function(...args) {
   return orig.apply(this, args);
 };
 
-Element.prototype.removeChild = optimize(Element.prototype.removeChild);
-// Element.prototype.appendChild = optimize(Element.prototype.appendChild);
+if ('<domopt>' === 'true') {
+  Element.prototype.removeChild = optimize(Element.prototype.removeChild);
+  // Element.prototype.appendChild = optimize(Element.prototype.appendChild);
+}
